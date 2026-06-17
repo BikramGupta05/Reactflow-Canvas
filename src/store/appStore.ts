@@ -1,51 +1,75 @@
 import { create } from "zustand";
+import type { Node, Edge } from "@xyflow/react";
+
+import {
+  initialNodes,
+  initialEdges,
+} from "@/features/flow/constants/initialGraph";
 
 type InspectorTab = "config" | "runtime";
 
-type AppState = {
-  selectedAppId: string | null;
+type AppStore = {
+  nodes: Node[];
+
+  edges: Edge[];
 
   selectedNodeId: string | null;
 
-  isMobilePanelOpen: boolean;
-
   activeInspectorTab: InspectorTab;
 
-  setSelectedAppId: (appId: string) => void;
+  setNodes: (nodes: Node[]) => void;
 
-  setSelectedNodeId: (nodeId: string | null) => void;
+  setEdges: (edges: Edge[]) => void;
 
-  setMobilePanelOpen: (open: boolean) => void;
+  setSelectedNodeId: (id: string | null) => void;
 
   setActiveInspectorTab: (tab: InspectorTab) => void;
+
+  updateNodeData: (nodeId: string, data: Record<string, unknown>) => void;
 };
 
-export const useAppStore = create<AppState>((set) => ({
-  selectedAppId: "app-1",
+export const useAppStore = create<AppStore>((set) => ({
+  nodes: initialNodes,
+
+  edges: initialEdges,
 
   selectedNodeId: null,
 
-  isMobilePanelOpen: false,
-
   activeInspectorTab: "config",
 
-  setSelectedAppId: (appId) =>
+  setNodes: (nodes) =>
     set({
-      selectedAppId: appId,
+      nodes,
     }),
 
-  setSelectedNodeId: (nodeId) =>
+  setEdges: (edges) =>
     set({
-      selectedNodeId: nodeId,
+      edges,
     }),
 
-  setMobilePanelOpen: (open) =>
+  setSelectedNodeId: (id) =>
     set({
-      isMobilePanelOpen: open,
+      selectedNodeId: id,
     }),
 
   setActiveInspectorTab: (tab) =>
     set({
       activeInspectorTab: tab,
     }),
+
+  updateNodeData: (nodeId, data) =>
+    set((state) => ({
+      nodes: state.nodes.map((node) =>
+        node.id === nodeId
+          ? {
+              ...node,
+
+              data: {
+                ...node.data,
+                ...data,
+              },
+            }
+          : node,
+      ),
+    })),
 }));

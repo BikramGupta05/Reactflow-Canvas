@@ -4,20 +4,22 @@ import {
   ReactFlow,
   Background,
   Controls,
-  useNodesState,
-  useEdgesState,
+  applyNodeChanges,
+  applyEdgeChanges,
 } from "@xyflow/react";
 
 import { useAppStore } from "@/store/appStore";
 
 import "@xyflow/react/dist/style.css";
 
-import { initialNodes, initialEdges } from "../constants/initialGraph";
-
 export function FlowCanvas() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const nodes = useAppStore((state) => state.nodes);
 
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const edges = useAppStore((state) => state.edges);
+
+  const setNodes = useAppStore((state) => state.setNodes);
+
+  const setEdges = useAppStore((state) => state.setEdges);
 
   const selectedNodeId = useAppStore((state) => state.selectedNodeId);
 
@@ -30,16 +32,16 @@ export function FlowCanvas() {
           return;
         }
 
-        setNodes((currentNodes) =>
-          currentNodes.filter((node) => node.id !== selectedNodeId),
+        const updatedNodes = nodes.filter((node) => node.id !== selectedNodeId);
+
+        const updatedEdges = edges.filter(
+          (edge) =>
+            edge.source !== selectedNodeId && edge.target !== selectedNodeId,
         );
 
-        setEdges((currentEdges) =>
-          currentEdges.filter(
-            (edge) =>
-              edge.source !== selectedNodeId && edge.target !== selectedNodeId,
-          ),
-        );
+        setNodes(updatedNodes);
+
+        setEdges(updatedEdges);
 
         setSelectedNodeId(null);
       }
@@ -50,15 +52,22 @@ export function FlowCanvas() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedNodeId, setNodes, setEdges, setSelectedNodeId]);
+  }, [selectedNodeId, nodes, edges, setNodes, setEdges, setSelectedNodeId]);
 
   return (
     <div className="flex-1">
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
+        onPaneClick={() => {
+          setSelectedNodeId(null);
+        }}
+        onNodesChange={(changes) => {
+          setNodes(applyNodeChanges(changes, nodes));
+        }}
+        onEdgesChange={(changes) => {
+          setEdges(applyEdgeChanges(changes, edges));
+        }}
         onNodeClick={(_, node) => {
           setSelectedNodeId(node.id);
         }}
