@@ -2,7 +2,7 @@ import { AppHeader } from "@/components/layout/AppHeader";
 
 import { NavigationRail } from "@/components/layout/NavigationRail";
 
-import { InspectorPanel } from "@/components/layout/InspectorPanel";
+import { InspectorPanel } from "@/features/inspector/components/InspectorPanel";
 
 import { FlowCanvas } from "@/features/flow/components/FlowCanvas";
 
