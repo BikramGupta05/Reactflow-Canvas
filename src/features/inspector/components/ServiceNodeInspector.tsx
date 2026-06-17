@@ -11,6 +11,7 @@ export function ServiceNodeInspector() {
   const activeTab = useAppStore((state) => state.activeInspectorTab);
 
   const setActiveTab = useAppStore((state) => state.setActiveInspectorTab);
+
   const updateNodeData = useAppStore((state) => state.updateNodeData);
 
   const selectedNode = nodes.find((node) => node.id === selectedNodeId);
@@ -41,6 +42,21 @@ export function ServiceNodeInspector() {
 
         <TabsContent value="config">
           <div className="space-y-3">
+            {/* Service name editor */}
+            <div className="space-y-1">
+              <label className="text-sm">Service Name</label>
+
+              <input
+                className="border rounded-md px-2 py-1 w-full"
+                value={selectedNode.data.label as string}
+                onChange={(event) =>
+                  updateNodeData(selectedNode.id, {
+                    label: event.target.value,
+                  })
+                }
+              />
+            </div>
+
             <div className="space-y-1">
               <label className="text-sm">CPU Cores</label>
 

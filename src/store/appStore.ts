@@ -26,6 +26,8 @@ type AppStore = {
   setActiveInspectorTab: (tab: InspectorTab) => void;
 
   updateNodeData: (nodeId: string, data: Record<string, unknown>) => void;
+
+  addNode: () => void;
 };
 
 export const useAppStore = create<AppStore>((set) => ({
@@ -71,5 +73,27 @@ export const useAppStore = create<AppStore>((set) => ({
             }
           : node,
       ),
+    })),
+
+  addNode: () =>
+    set((state) => ({
+      nodes: [
+        ...state.nodes,
+        {
+          id: crypto.randomUUID(),
+
+          position: {
+            x: 200,
+            y: 200,
+          },
+
+          data: {
+            label: "Service Node",
+            status: "healthy",
+            cpu: 1,
+            memory: 256,
+          },
+        },
+      ],
     })),
 }));

@@ -27,6 +27,15 @@ export function FlowCanvas() {
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
+      const target = event.target as HTMLElement;
+
+      const isTyping =
+        target.tagName === "INPUT" || target.tagName === "TEXTAREA";
+
+      if (isTyping) {
+        return;
+      }
+
       if (event.key === "Delete" || event.key === "Backspace") {
         if (!selectedNodeId) {
           return;
