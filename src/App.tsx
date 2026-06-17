@@ -1,10 +1,24 @@
-import { Button } from "@/components/ui/button";
+import { AppHeader } from "@/components/layout/AppHeader";
+
+import { NavigationRail } from "@/components/layout/NavigationRail";
+
+import { InspectorPanel } from "@/components/layout/InspectorPanel";
+
+import { FlowCanvas } from "@/features/flow/components/FlowCanvas";
 
 function App() {
   return (
-    <main className="flex h-screen items-center justify-center">
-      <Button>Open Builder</Button>
-    </main>
+    <div className="h-screen flex flex-col">
+      <AppHeader />
+
+      <div className="flex flex-1">
+        <NavigationRail />
+
+        <FlowCanvas />
+
+        <InspectorPanel />
+      </div>
+    </div>
   );
 }
 
