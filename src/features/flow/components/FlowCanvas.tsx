@@ -10,6 +10,8 @@ import {
 
 import { useAppStore } from "@/store/appStore";
 
+import { useGraph } from "@/features/apps/hooks/useGraph";
+
 import "@xyflow/react/dist/style.css";
 
 export function FlowCanvas() {
@@ -17,22 +19,35 @@ export function FlowCanvas() {
 
   const edges = useAppStore((state) => state.edges);
 
+  const selectedAppId = useAppStore((state) => state.selectedAppId);
+
+  const selectedNodeId = useAppStore((state) => state.selectedNodeId);
+
   const setNodes = useAppStore((state) => state.setNodes);
 
   const setEdges = useAppStore((state) => state.setEdges);
 
-  const selectedNodeId = useAppStore((state) => state.selectedNodeId);
-
   const setSelectedNodeId = useAppStore((state) => state.setSelectedNodeId);
+
+  const { data, isLoading, isError } = useGraph(selectedAppId);
+
+  useEffect(() => {
+    if (!data) {
+      return;
+    }
+
+    setNodes(data.nodes);
+
+    setEdges(data.edges);
+
+    setSelectedNodeId(null);
+  }, [data, setNodes, setEdges, setSelectedNodeId]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       const target = event.target as HTMLElement;
 
-      const isTyping =
-        target.tagName === "INPUT" || target.tagName === "TEXTAREA";
-
-      if (isTyping) {
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
         return;
       }
 
@@ -41,16 +56,14 @@ export function FlowCanvas() {
           return;
         }
 
-        const updatedNodes = nodes.filter((node) => node.id !== selectedNodeId);
+        setNodes(nodes.filter((node) => node.id !== selectedNodeId));
 
-        const updatedEdges = edges.filter(
-          (edge) =>
-            edge.source !== selectedNodeId && edge.target !== selectedNodeId,
+        setEdges(
+          edges.filter(
+            (edge) =>
+              edge.source !== selectedNodeId && edge.target !== selectedNodeId,
+          ),
         );
-
-        setNodes(updatedNodes);
-
-        setEdges(updatedEdges);
 
         setSelectedNodeId(null);
       }
@@ -63,22 +76,30 @@ export function FlowCanvas() {
     };
   }, [selectedNodeId, nodes, edges, setNodes, setEdges, setSelectedNodeId]);
 
+  if (isLoading) {
+    return (
+      <div className="flex-1 grid place-items-center">Loading graph...</div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex-1 grid place-items-center">Failed to load graph</div>
+    );
+  }
+
   return (
     <div className="flex-1">
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        onPaneClick={() => {
-          setSelectedNodeId(null);
-        }}
-        onNodesChange={(changes) => {
-          setNodes(applyNodeChanges(changes, nodes));
-        }}
-        onEdgesChange={(changes) => {
-          setEdges(applyEdgeChanges(changes, edges));
-        }}
+        onNodesChange={(changes) => setNodes(applyNodeChanges(changes, nodes))}
+        onEdgesChange={(changes) => setEdges(applyEdgeChanges(changes, edges))}
         onNodeClick={(_, node) => {
           setSelectedNodeId(node.id);
+        }}
+        onPaneClick={() => {
+          setSelectedNodeId(null);
         }}
         fitView
       >

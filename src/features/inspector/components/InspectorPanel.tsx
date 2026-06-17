@@ -1,17 +1,13 @@
-import { useAppStore } from "@/store/appStore";
+import { AppSelector } from "@/features/apps/components/AppSelector";
 
 import { ServiceNodeInspector } from "./ServiceNodeInspector";
 
 export function InspectorPanel() {
-  const selectedNodeId = useAppStore((state) => state.selectedNodeId);
-
   return (
-    <aside className="w-80 border-l p-4">
-      {selectedNodeId ? (
-        <ServiceNodeInspector />
-      ) : (
-        <p className="text-sm text-muted-foreground">Select a node</p>
-      )}
+    <aside className="w-80 border-l">
+      <AppSelector />
+
+      <ServiceNodeInspector />
     </aside>
   );
 }

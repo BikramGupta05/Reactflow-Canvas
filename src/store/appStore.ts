@@ -10,8 +10,9 @@ type InspectorTab = "config" | "runtime";
 
 type AppStore = {
   nodes: Node[];
-
   edges: Edge[];
+
+  selectedAppId: string;
 
   selectedNodeId: string | null;
 
@@ -22,6 +23,8 @@ type AppStore = {
   setEdges: (edges: Edge[]) => void;
 
   setSelectedNodeId: (id: string | null) => void;
+
+  setSelectedAppId: (id: string) => void;
 
   setActiveInspectorTab: (tab: InspectorTab) => void;
 
@@ -34,6 +37,8 @@ export const useAppStore = create<AppStore>((set) => ({
   nodes: initialNodes,
 
   edges: initialEdges,
+
+  selectedAppId: "payment-system",
 
   selectedNodeId: null,
 
@@ -52,6 +57,12 @@ export const useAppStore = create<AppStore>((set) => ({
   setSelectedNodeId: (id) =>
     set({
       selectedNodeId: id,
+    }),
+
+  setSelectedAppId: (id) =>
+    set({
+      selectedAppId: id,
+      selectedNodeId: null,
     }),
 
   setActiveInspectorTab: (tab) =>
